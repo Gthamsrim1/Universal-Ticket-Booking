@@ -1,26 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+    --font-poppins: Poppins, sans-serif;
+
+    --animate-border-rotate: border-rotate 20s linear infinite;
+
+        @keyframes border-rotate {
+        100% {
+            rotate: 360deg;
+        }
+    }
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer {
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .custom-scroll::-webkit-scrollbar {
+        height: 8px;
+    }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+    .custom-scroll::-webkit-scrollbar-track {
+        background: #1f1f1f;
+        border-radius: 10px;
+    }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+    .custom-scroll::-webkit-scrollbar-thumb {
+        background: #b91c1c;
+        border-radius: 10px;
+    }
+
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+        background: #dc2626;
+    }
+
+
+    .custom-scroll {
+        scrollbar-width: thin;
+        scrollbar-color: #b91c1c #1f1f1f;
+    }
+
+    .ball-bounce {
+        animation: bounce-custom 10s infinite ease-in-out;
+    }
+
+    @keyframes bounce-custom {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-50%);
+        }
+    }
 }
