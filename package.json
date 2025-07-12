@@ -12,6 +12,8 @@
     "@react-three/drei": "^10.2.0",
     "@react-three/fiber": "^9.1.2",
     "@react-three/postprocessing": "^3.0.4",
+    "@stripe/react-stripe-js": "^3.7.0",
+    "@stripe/stripe-js": "^7.4.0",
     "@types/three": "^0.177.0",
     "axios": "^1.10.0",
     "gsap": "^3.13.0",
@@ -22,6 +24,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-player": "^2.16.0",
+    "stripe": "^18.3.0",
     "three": "^0.177.0"
   },
   "devDependencies": {

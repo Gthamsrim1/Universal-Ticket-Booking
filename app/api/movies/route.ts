@@ -99,7 +99,6 @@ export async function POST(request: NextRequest) {
         )
       }
     } else if (type == 'get') {
-          console.log(movieId);
           const tmdbRes = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${process.env.TMDB_API_KEY}&append_to_response=videos,credits`);
           const tmdbData = await tmdbRes.json();
 

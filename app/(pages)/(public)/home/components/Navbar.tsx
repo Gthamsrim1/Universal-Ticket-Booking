@@ -6,8 +6,7 @@ import { User, Settings, Calendar, Heart, LogOut, X } from 'lucide-react';
  
 const Navbar = () => { 
   const router = useRouter();  
-  const [curUser, setCurUser] = useState<any>(""); 
-  const [dropdown, setDropdown] = useState(false) 
+  const [curUser, setCurUser] = useState<any>("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => { 
@@ -17,7 +16,7 @@ const Navbar = () => {
         setCurUser(storedUser); 
       } else { 
         setCurUser(""); 
-      } 
+      }
     }; 
 
     updateUser(); 
@@ -36,18 +35,21 @@ const Navbar = () => {
 
   const sidebarItems = [
     { icon: User, label: 'Profile', path: `/user/${curUser?.id}` },
-    { icon: Calendar, label: 'My Bookings', path: '/user/bookings' },
+    { icon: Calendar, label: 'My Bookings', path: `/user/${curUser?.id}/bookings` },
     { icon: Heart, label: 'Favorites', path: '/user/favorites' },
     { icon: Settings, label: 'Settings', path: '/user/settings' },
   ];
 
   return ( 
     <>
-      <div className='flex items-center text-white w-full px-8 py-4 relative z-50'> 
+      <div className='flex items-center text-white w-full px-8 py-6 relative z-50'>
+        <div className='absolute h-[70px] w-[70px] left-[5vw] top-1 blur-2xl bg-blue-400/30'></div> 
+        <img src="/Logo.png" alt="Logo" width={150} className='translate-x-10'/>
         <div className='flex justify-center flex-1 absolute left-[37.5%]'> 
           <div className='flex items-center pointer-events-auto'> 
             {navLinks.map((nav, i) => ( 
-              <div 
+              <div
+                onClick={() => router.push(nav.link)}
                 className='group cursor-pointer bg-white/5 hover:bg-white/15 transition-all duration-500' 
                 style={{ 
                   borderRadius: 
@@ -65,8 +67,8 @@ const Navbar = () => {
                 }} 
                 key={i} 
               > 
-                <p className='text-white transition-all duration-300 text-sm font-semibold backdrop:blur-lg group-hover:backdrop-blur-2xl group-hover:text-shadow-[1px_-1px_4px_rgb(0,255,255)]'> 
-                  {nav} 
+                <p className='text-white transition-all duration-300 text-sm font-semibold backdrop:blur-lg group-hover:backdrop-blur-2xl group-hover:text-shadow-[1px_-1px_16px_rgb(0,0,255)]'> 
+                  {nav.title} 
                 </p> 
               </div> 
             ))} 
@@ -113,16 +115,20 @@ const Navbar = () => {
           <div className="flex justify-end mb-6">
             <button 
               onClick={() => setSidebarOpen(false)}
-              className="text-white hover:text-gray-300 transition-colors duration-200"
+              className="text-white cursor-pointer hover:scale-105 hover:text-gray-300 transition-colors duration-200"
             >
               <X size={24} />
             </button>
           </div>
 
           <div className="flex items-center gap-4 mb-8 pb-6 border-b border-white/20">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-              <User size={24} className="text-white" />
-            </div>
+            {curUser?.avatar ?
+              <img src={curUser.avatar} alt="Profile" className="w-16 h-16 rounded-full object-cover border-2 border-white" />
+              :
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                <User size={24} className="text-white" />
+              </div>
+            }
             <div>
               <h3 className="text-white font-semibold text-lg">
                 {curUser?.user || 'User'}
@@ -142,7 +148,7 @@ const Navbar = () => {
                       router.push(item.path);
                       setSidebarOpen(false);
                     }}
-                    className="w-full flex items-center gap-4 px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-all duration-200 group"
+                    className="w-full flex items-center gap-4 px-4 py-3 cursor-pointer text-white hover:bg-white/10 rounded-lg transition-all duration-200 group"
                   >
                     <item.icon size={20} className="group-hover:text-blue-400 transition-colors duration-200" />
                     <span className="font-medium">{item.label}</span>

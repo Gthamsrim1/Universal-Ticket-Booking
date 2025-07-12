@@ -35,6 +35,7 @@ const EventSchema = new mongoose.Schema({
   eventType: String,
   price: Number,
   availableSeats: Number,
+  maxSeats: Number,
 }, { timestamps: true });
 
 const EventModel = mongoose.models.Events || mongoose.model("Events", EventSchema);

@@ -21,7 +21,7 @@ export async function POST(req: Request) {
         const updated = await EventModel.findOneAndUpdate({title: event.title, artist: event.artist}, {...event, active}, { new: true });
         return NextResponse.json({ message: "Event updated"});
       } else {
-        const newEvent = await EventModel.create({...event, _id: count + 1, active, availableSeats: event.seats, venue: event.location});
+        const newEvent = await EventModel.create({...event, _id: count + 1, active, availableSeats: event.seats, venue: event.location, maxSeats: event.seats});
         return NextResponse.json({ message: "Event created", event: newEvent }, { status: 201 });
       }
     } else if (type == "list") {
@@ -33,6 +33,9 @@ export async function POST(req: Request) {
     } else if (type == 'remove') {
       const deletedEvent = EventModel.deleteOne({_id: event._id})
       return NextResponse.json({message: "Event successfully deleted"});
+    } else if (type == 'get') {
+      const foundEvent = await EventModel.findOne({_id: Number(event.id)})
+      return NextResponse.json({ event: foundEvent }); 
     }
     return NextResponse.json({ message: "Invalid type" }, { status: 400 });
   } catch (error) {

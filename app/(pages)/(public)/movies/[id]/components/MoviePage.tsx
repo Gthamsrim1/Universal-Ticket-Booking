@@ -6,6 +6,15 @@ import Image from 'next/image';
 import ReactPlayer from 'react-player/youtube';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Elements } from '@stripe/react-stripe-js';
+import PaymentForm from '../../../events/components/PaymentForm';
+import { loadStripe } from '@stripe/stripe-js';
+
+if (!process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY) {
+  throw new Error("Stripe public key is not set.");
+}
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -59,13 +68,15 @@ interface ShowTime {
 }
 
 export default function MoviePage({ movie }: { movie: Movie }) {
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [ticketQuantity, setTicketQuantity] = useState(0);
   const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
   const [selectedShowtime, setSelectedShowtime] = useState<ShowTime | null>(null);
   const [showSeatMap, setShowSeatMap] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [seatMap, setSeatMap] = useState<Record<string, Seat[]>>({});
 
-  const [bookingStep, setBookingStep] = useState<'showtime' | 'seats' | 'confirmation'>('showtime');
+  const [bookingStep, setBookingStep] = useState<'showtime' | 'seats' | 'payment' | 'confirmation'>('showtime');
   
   const heroRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -285,31 +296,25 @@ export default function MoviePage({ movie }: { movie: Movie }) {
 
 
 
-  const handleProceedToConfirmation = () => {
-    setShowSeatMap(false)
-    setBookingStep('confirmation');
-  };
+  const handleProceedToPayment = async () => {
+    try {
+      const res = await fetch('/api/create-payment-intent', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              amount: Number(getTotalPrice().toFixed(2)) * 100,
+              movieId: movie._id,
+              ticketCount: ticketQuantity, 
+            }),
+          });
 
-  const handleConfirmBooking = () => {
-    if (!selectedShowtime) return;
-
-    const updatedSeats = (seatMap[selectedShowtime.id] || []).map(seat =>
-      selectedSeats.some(s => s.id === seat.id)
-        ? { ...seat, status: 'booked' as const}
-        : seat
-    );
-
-    setSeatMap(prev => ({
-      ...prev,
-      [selectedShowtime.id]: updatedSeats
-    }));
-
-    alert(`Booking confirmed! Seats: ${selectedSeats.map(s => s.id).join(', ')}`);
-
-    setSelectedSeats([]);
-    setTicketQuantity(0);
-    setBookingStep('showtime');
-    setShowSeatMap(false);
+      const data = await res.json();
+      setClientSecret(data.clientSecret);
+      setShowSeatMap(false)
+      setBookingStep('payment');
+    } catch (error) {
+      console.log(error);
+    }
   };
 
 
@@ -344,8 +349,62 @@ export default function MoviePage({ movie }: { movie: Movie }) {
     }
   };
 
+  const handlePaymentSuccess = async () => {
+    if (movie) {
+      try {
+        const stored = localStorage.getItem('curUser');
+        const curUser = stored ? JSON.parse(stored) : null;
+        const d = new Date();
+
+        await fetch('/api/bookings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user: curUser.user,
+            email: curUser.email,
+            seats: selectedSeats.map(s => s.id),
+            bookingTime: `${d.getHours()}:${d.getMinutes()}`,
+            bookingDate: d,
+            experience: movie._id,
+            experienceType: 'movie',
+            date: '2024-07-15',
+            time: movie.showtimes[0],
+            price: Number(getTotalPrice().toFixed(2)),
+            type: 'booking',
+          }),
+        });        
+        setBookingStep('confirmation');
+        if (!selectedShowtime) return;
+
+        const updatedSeats = (seatMap[selectedShowtime.id] || []).map(seat =>
+          selectedSeats.some(s => s.id === seat.id)
+            ? { ...seat, status: 'booked' as const}
+            : seat
+        );
+        setSeatMap(prev => ({
+          ...prev,
+          [selectedShowtime.id]: updatedSeats
+        }));
+
+        setSelectedSeats([]);
+        setTicketQuantity(0);
+        setShowSeatMap(false);
+      } catch (error) {
+        console.error('Error saving booking:', error);
+      }
+    }
+  };
+
   if (!movie) {
-    return <div>Loading...</div>; // Or handle missing data
+    return (
+      <div className='min-h-screen bg-gradient-to-br from-slate-900 to-slate-950 text-white overflow-x-hidden flex justify-center items-center'>
+      <div className="flex flex-row gap-2 scale-200">
+        <div className="w-4 h-4 rounded-full bg-blue-700 animate-bounce"></div>
+        <div className="w-4 h-4 rounded-full bg-blue-700 animate-bounce [animation-delay:-.3s]"></div>
+        <div className="w-4 h-4 rounded-full bg-blue-700 animate-bounce [animation-delay:-.5s]"></div>
+      </div>
+    </div>
+    );
   }
 
   return (
@@ -564,7 +623,7 @@ export default function MoviePage({ movie }: { movie: Movie }) {
                     <div className="flex justify-between items-center text-lg font-bold">
                       <span>Total: {getTotalPrice().toFixed(2)} Rs.</span>
                       <button
-                        onClick={handleProceedToConfirmation}
+                        onClick={handleProceedToPayment}
                         className="bg-green-600 hover:bg-green-700 disabled:bg-gradient-to-r disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white px-6 py-2 rounded-xl transition-all duration-300 cursor-pointer"
                       >
                         Proceed to Payment
@@ -649,10 +708,23 @@ export default function MoviePage({ movie }: { movie: Movie }) {
               </div>
             )}
 
+            {clientSecret && stripePromise && bookingStep === 'payment' && (
+              <Elements stripe={stripePromise} options={{ clientSecret }}>
+                <PaymentForm
+                  clientSecret={clientSecret}
+                  onPaymentSuccess={handlePaymentSuccess}
+                  onCancel={() => setBookingStep('seats')}
+                  ticketCount={ticketQuantity}
+                  totalAmount={Number(getTotalPrice().toFixed(2))}
+                  eventTitle={movie.title}
+                />
+              </Elements>
+            )}
+
             {bookingStep === 'confirmation' && (
               <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-lg p-8 rounded-3xl border border-white/20 shadow-2xl">
                 <h3 className="text-2xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                  Confirm Booking
+                  Booking Confirmed
                 </h3>
                 
                 <div className="space-y-4 mb-6">
@@ -675,12 +747,6 @@ export default function MoviePage({ movie }: { movie: Movie }) {
                 </div>
 
                 <div className="space-y-3">
-                  <button
-                    onClick={handleConfirmBooking}
-                    className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105"
-                  >
-                    Confirm & Pay
-                  </button>
                   <button
                     onClick={() => setBookingStep('seats')}
                     className="w-full bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300"

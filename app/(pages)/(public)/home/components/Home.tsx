@@ -29,7 +29,7 @@ const Home = () => {
     <div className='h-screen w-screen overflow-x-hidden'>
       <div
         ref={overlayRef}
-        className='fixed w-[200vw] h-[200vw] bg-gradient-to-br left-[-10vw] from-orange-500 to-orange-600 z-50 pointer-events-none shadow-2xl'
+        className='fixed w-[200vw] h-[200vw] bg-gradient-to-br left-[-10vw] from-orange-500 to-orange-600 z-[1011] pointer-events-none shadow-2xl'
       >
         <div className='fixed w-[5vw] h-[200vw] bg-orange-800 z-50 pointer-events-none shadow-2xl'></div>
         <div className='fixed w-[5vw] h-[200vw] bg-orange-900 z-50 pointer-events-none shadow-2xl ml-[5vw]'></div>

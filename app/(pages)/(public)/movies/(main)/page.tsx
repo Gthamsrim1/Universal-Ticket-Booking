@@ -15,17 +15,6 @@ interface Movie {
 }
 
 const page = () => {
-  const movie = {
-    backdrop_path: "/GOTG.jpg",
-    _id: "45678",
-    title: "Guardians of the Galaxy",
-    release: new Date("2014-08-01"),
-    genres: ["Action", "Adventure", "Sci-Fi"],
-    runtime: "2h 1m",
-    rating: "4.6",
-    language: "English",
-  };
-
   const [movies, setMovies] = useState<Movie[]>([]);
 
   useEffect(() => {

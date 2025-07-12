@@ -1,1 +1,1 @@
-export const navLinks = ['Home', 'Movies', 'Concerts', 'Trains'];
+export const navLinks = [{title: 'Home', link: '/home'}, {title: 'Movies', link: '/movies'}, {title: 'Events', link: '/events'}, {title: 'Travel', link: '/travels'}];

@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Calendar } from 'lucide-react';
 
 interface Event {
   _id: Number;
@@ -125,8 +126,8 @@ const EventCard = ({ event, scrollOffset, clickPrevented }: { event: Event; scro
           <p className='text-gray-400 text-sm z-10 flex mt-[2px] truncate'>
             {event.location}
           </p>
-          <p className='text-gray-400 font-semibold text-sm z-10'>
-            📅 {convDay(new Date(event.date).getDay())}, {new Date(event.date).getDate()}th {convMonth(new Date(event.date).getMonth())} at {event.time}
+          <p className='text-gray-400 font-semibold text-sm z-10 flex items-center gap-1'>
+            <Calendar className='text-blue-400' size={15}/> {convDay(new Date(event.date).getDay())}, {new Date(event.date).getDate()}th {convMonth(new Date(event.date).getMonth())} at {event.time}
           </p>
           <p className='text-gray-400 text-sm z-10'>
             {event.eventType}

@@ -124,7 +124,7 @@ const SearchableSelect = ({ value, onChange, stations, placeholder, className = 
         type="button"
         onClick={handleToggle}
         disabled={isAnimating}
-        className={`bg-gray-800 border border-yellow-700 text-white cursor-pointer font-semibold truncate text-lg ${className} focus:ring-yellow-500 focus:border-yellow-500 w-56 px-6 py-3 flex items-center justify-between hover:bg-gray-700 transition-colors disabled:cursor-not-allowed`}
+        className={`bg-gray-800 border border-blue-700 text-white cursor-pointer font-semibold truncate text-lg ${className} focus:ring-blue-500 focus:border-blue-500 w-56 px-6 py-3 flex items-center justify-between hover:bg-gray-700 transition-colors disabled:cursor-not-allowed`}
       >
         <span className={selectedStation ? 'text-white' : 'text-gray-400'}>
           {selectedStation ? selectedStation.name : placeholder}
@@ -135,7 +135,7 @@ const SearchableSelect = ({ value, onChange, stations, placeholder, className = 
       {isOpen && (
         <div 
           ref={dropdownContentRef}
-          className="absolute top-full left-0 right-0 mt-1 bg-gray-800 border border-yellow-700 rounded-xl shadow-lg z-50 max-h-80 overflow-hidden"
+          className="absolute top-full left-0 right-0 mt-1 bg-gray-800 border border-blue-700 rounded-xl shadow-lg z-50 max-h-80 overflow-hidden"
           style={{ opacity: 0, transform: 'translateY(-10px) scaleY(0.8)' }}
         >
           <div className="p-3 border-b border-gray-700">
@@ -146,13 +146,30 @@ const SearchableSelect = ({ value, onChange, stations, placeholder, className = 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search stations..."
-                className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 autoFocus
               />
             </div>
           </div>
           
-          <div className="max-h-60 overflow-y-auto">
+          <div className="max-h-60 overflow-y-auto" style={{scrollbarWidth: 'thin', scrollbarColor: 'rgba(59, 130, 246, 0.5) transparent',}}>
+            <style>
+              {`
+                div::-webkit-scrollbar {
+                  width: 8px;
+                }
+                div::-webkit-scrollbar-track {
+                  background: transparent;
+                }
+                div::-webkit-scrollbar-thumb {
+                  background-color: rgba(59, 130, 246, 0.5);
+                  border-radius: 4px;
+                }
+                div::-webkit-scrollbar-thumb:hover {
+                  background-color: rgba(59, 130, 246, 0.7);
+                }
+              `}
+            </style>
             {filteredStations.length === 0 ? (
               <div className="px-6 py-4 text-gray-400 text-center">
                 No stations found
@@ -162,11 +179,11 @@ const SearchableSelect = ({ value, onChange, stations, placeholder, className = 
                 <button
                   key={station.code}
                   onClick={() => handleSelect(station.code)}
-                  className="w-full px-6 py-3 text-left hover:bg-gray-700 focus:bg-gray-700 focus:outline-none transition-colors text-white"
+                  className="w-full px-6 py-3 text-left cursor-pointer hover:bg-gray-700 focus:bg-gray-700 focus:outline-none transition-colors text-white"
                 >
                   <div className="flex justify-between items-center">
                     <span>{station.name}</span>
-                    <span className="text-yellow-400 text-sm">{station.code}</span>
+                    <span className="text-cyan-400 text-sm">{station.code}</span>
                   </div>
                 </button>
               ))
@@ -224,7 +241,7 @@ const StationSelector = ({ stations }: { stations: Station[] }) => {
               className='rounded-l-xl'
             />
             
-            <p className="bg-gray-800 border border-yellow-700 text-yellow-300 font-semibold truncate text-lg focus:ring-yellow-500 focus:border-yellow-500 px-6 py-3 pointer-events-none flex items-center justify-between disabled:cursor-not-allowed">to</p>
+            <p className="bg-gray-800 border border-blue-700 text-cyan-300 font-semibold truncate text-lg focus:ring-blue-500 focus:border-blue-500 px-6 py-3 pointer-events-none flex items-center justify-between disabled:cursor-not-allowed">to</p>
             
             <SearchableSelect
               value={to}
@@ -234,19 +251,19 @@ const StationSelector = ({ stations }: { stations: Station[] }) => {
               className=''
             />
 
-            <div className="bg-gray-800 gap-1 flex-col border border-yellow-700 text-yellow-300 font-semibold truncate text-lg pt-[3px] pb-[2px] rounded-r-xl focus:ring-yellow-500 focus:border-yellow-500 px-6 flex items-center hover:bg-gray-700 cursor-pointer justify-between disabled:cursor-not-allowed transition-all duration-200">
+            <div className="bg-gray-800 gap-1 flex-col border border-blue-700 text-cyan-300 font-semibold truncate text-lg pt-[3px] pb-[2px] rounded-r-xl focus:ring-blue-500 focus:border-blue-500 px-6 flex items-center hover:bg-gray-700 cursor-pointer justify-between disabled:cursor-not-allowed transition-all duration-200">
               <p className='text-gray-300 text-[10px] self-start relative'>Date of Journey</p>
               <p className='text-white'>dd-mm-yyyy</p>
             </div>
           </div>
 
           {from && to && (
-            <div className="mt-6 p-4 bg-gray-800 rounded-xl border border-yellow-700 animate-[fadeIn_0.3s_ease-in-out]">
+            <div className="mt-6 p-4 bg-gray-800 rounded-xl border border-blue-700 animate-[fadeIn_0.3s_ease-in-out]">
               <p className="text-white text-lg">
-                <span className="text-yellow-300">From:</span> {sampleStations.find(s => s.code === from)?.name} ({from})
+                <span className="text-cyan-300">From:</span> {sampleStations.find(s => s.code === from)?.name} ({from})
               </p>
               <p className="text-white text-lg">
-                <span className="text-yellow-300">To:</span> {sampleStations.find(s => s.code === to)?.name} ({to})
+                <span className="text-cyan-300">To:</span> {sampleStations.find(s => s.code === to)?.name} ({to})
               </p>
             </div>
           )}
