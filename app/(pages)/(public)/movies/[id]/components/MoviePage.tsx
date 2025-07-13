@@ -356,7 +356,7 @@ export default function MoviePage({ movie }: { movie: Movie }) {
         const curUser = stored ? JSON.parse(stored) : null;
         const d = new Date();
 
-        await fetch('/api/bookings', {
+        const res = await fetch('/api/bookings', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -367,12 +367,14 @@ export default function MoviePage({ movie }: { movie: Movie }) {
             bookingDate: d,
             experience: movie._id,
             experienceType: 'movie',
-            date: '2024-07-15',
-            time: movie.showtimes[0],
+            date: new Date('2025-07-15'),
+            time: movie.showtimes[0].times[0],
             price: Number(getTotalPrice().toFixed(2)),
             type: 'booking',
           }),
-        });        
+        });    
+        
+        console.log(res.json());
         setBookingStep('confirmation');
         if (!selectedShowtime) return;
 
@@ -385,8 +387,6 @@ export default function MoviePage({ movie }: { movie: Movie }) {
           ...prev,
           [selectedShowtime.id]: updatedSeats
         }));
-
-        setSelectedSeats([]);
         setTicketQuantity(0);
         setShowSeatMap(false);
       } catch (error) {
@@ -674,7 +674,7 @@ export default function MoviePage({ movie }: { movie: Movie }) {
                   <p><span className="font-bold text-purple-300">Movie:</span> {movie.title}</p>
                   <p><span className="font-bold text-purple-300">Time:</span> {selectedShowtime.time}</p>
                   <p><span className="font-bold text-purple-300">Date:</span> {selectedShowtime.date}</p>
-                  <p><span className="font-bold text-purple-300">Tickets:</span> {ticketQuantity}</p>
+                  <p><span className="font-bold text-purple-300">Tickets:</span> {ticketQuantity/2}</p>
                 </div>
                 
                 <button
@@ -714,7 +714,7 @@ export default function MoviePage({ movie }: { movie: Movie }) {
                   clientSecret={clientSecret}
                   onPaymentSuccess={handlePaymentSuccess}
                   onCancel={() => setBookingStep('seats')}
-                  ticketCount={ticketQuantity}
+                  ticketCount={ticketQuantity/2}
                   totalAmount={Number(getTotalPrice().toFixed(2))}
                   eventTitle={movie.title}
                 />
@@ -748,7 +748,10 @@ export default function MoviePage({ movie }: { movie: Movie }) {
 
                 <div className="space-y-3">
                   <button
-                    onClick={() => setBookingStep('seats')}
+                    onClick={() => {
+                      setBookingStep('seats')
+                      setSelectedSeats([]);
+                    }}
                     className="w-full bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300"
                   >
                     Back to Seats
