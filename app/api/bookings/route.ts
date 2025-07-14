@@ -7,7 +7,6 @@ export async function POST(req: Request) {
         const { type, ...booking } = body;
         if (type == 'booking') {
             const newBooking = await BookingsModel.create(booking);
-            console.log(newBooking);
             return NextResponse.json({ message: "Booking Updated" })
         } else if (type == 'cancel') {
             const removedBooking = await BookingsModel.deleteOne(booking);

@@ -1,27 +1,39 @@
-import { NextResponse } from "next/server";
-import TrainModel from "../(models)/Trains";
+import { NextRequest, NextResponse } from 'next/server'
 
-export async function POST(req: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const body = await req.json();
-    const { from, to, date } = body;
+    const { from, to, date } = await request.json();
 
     if (!from || !to || !date) {
-      return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Missing required fields: from, to' },
+        { status: 400 }
+      );
     }
 
-    const travelDate = new Date(date);
-    const dayOfWeek = travelDate.toLocaleString('en-US', { weekday: 'short' });
+    const response = await fetch(`https://irctc1.p.rapidapi.com/api/v1/searchTrain?fromStationCode=${from}&toStationCode=${to}&dateOfJourney=${date}`,
+      {
+        method: 'GET',
+        headers: {
+          'X-RapidAPI-Key': process.env.RAPIDAPI_KEY!,
+          'X-RapidAPI-Host': 'irctc1.p.rapidapi.com'
+        }
+      }
+    );
 
-    const trains = await TrainModel.find({
-      start: from,
-      destination: to,
-      daysOfOperation: dayOfWeek,
-    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      return NextResponse.json(
+        { error: 'Failed to fetch train data', details: errorText },
+        { status: 501  }
+      );
+    }
 
-    return NextResponse.json({ trains }, { status: 200 });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ message: "Internal Server Error", error }, { status: 500 });
+    const res = await response.json();
+    console.log(res);
+    return NextResponse.json({ trains: res.data });
+  } catch (error: any) {
+    console.error('Error fetching train data:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
