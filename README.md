@@ -86,8 +86,7 @@ App will be running at: **http://localhost:3000**
   <img width="1898" height="904" alt="image" src="https://github.com/user-attachments/assets/49982799-93ba-4eac-99e9-afcf9d439adf" />
   <img width="1889" height="906" alt="image" src="https://github.com/user-attachments/assets/e72fa456-cb57-4d6f-abd3-4c5ea2f8ad13" />
   <img width="1897" height="907" alt="image" src="https://github.com/user-attachments/assets/46bb5918-c6b1-425a-9233-1d88b36c92a0" />
-
-
+  <img width="1891" height="905" alt="image" src="https://github.com/user-attachments/assets/bbb58b95-6a1e-4e17-8677-2576a155a8bb" />
 </p>
 
 ---
